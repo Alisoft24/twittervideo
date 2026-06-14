@@ -1,49 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
     <style>
         * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            box-sizing: border-box;
         }
-        body {
-            background: #000;
+        html, body {
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            background: #000;
         }
         video {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            z-index: 999;
+        }
+        #overlay.show {
+            display: flex;
+        }
+        #overlay h2 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        #overlay p {
+            font-size: 15px;
+            opacity: 0.8;
+        }
+        #countdown {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1d9bf0;
+            margin: 10px 0;
+        }
+        #readbtn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #1d9bf0;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+
     <video 
-        id="myVideo"
+        id="vid"
         autoplay 
         muted 
         playsinline
         webkit-playsinline
-        preload="auto"
-        src="https://samplelib.com/mp4/sample-5s-360p.mp4">
+        preload="auto">
+        <source src="https://alisoft24.github.io/twittervideo/testvideo.mp4" type="video/mp4">
     </video>
 
+    <div id="overlay">
+        <h2>Read the Full Article</h2>
+        <div id="countdown">3</div>
+        <p>Redirecting automatically...</p>
+        <button id="readbtn">Read Now →</button>
+    </div>
+
     <script>
-        var video = document.getElementById('myVideo');
+        var video = document.getElementById('vid');
+        var overlay = document.getElementById('overlay');
+        var countdownEl = document.getElementById('countdown');
+        var readbtn = document.getElementById('readbtn');
         
-        // When video ends, redirect to Blogspot
+        // YOUR BLOGSPOT URL - Change this
+        var blogURL = 'https://alisoft24.blogspot.com/2026/06/blog-post.html';
+
+        // When video ends → show overlay + countdown
         video.addEventListener('ended', function() {
-            window.top.location.href = 'https://alisoft24.blogspot.com/2026/06/blog-post.html';
+            overlay.classList.add('show');
+            var count = 3;
+            countdownEl.textContent = count;
+
+            var timer = setInterval(function() {
+                count--;
+                countdownEl.textContent = count;
+                if (count <= 0) {
+                    clearInterval(timer);
+                    redirect();
+                }
+            }, 1000);
         });
 
-        // Try to autoplay
-        video.play().catch(function(error) {
-            console.log('Autoplay blocked:', error);
+        // Button click
+        readbtn.addEventListener('click', function() {
+            redirect();
+        });
+
+        function redirect() {
+            try {
+                window.top.location.href = blogURL;
+            } catch(e) {
+                window.location.href = blogURL;
+            }
+        }
+
+        // Autoplay
+        video.play().catch(function() {
+            video.setAttribute('controls', 'true');
         });
     </script>
+
 </body>
 </html>
